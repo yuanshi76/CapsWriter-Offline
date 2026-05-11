@@ -31,6 +31,33 @@ class ServerConfig:
     # os.environ["GGML_VK_DISABLE_F16"] = "1"       # 集成显卡解码有误，强制熔断时尝试
 
 
+class OpenAIAPIConfig:
+    """OpenAI 兼容语音转写接口配置"""
+
+    # 是否随服务端启动 HTTP 接口
+    enable = True
+
+    # OpenAI 兼容接口地址：
+    #   POST /v1/audio/transcriptions
+    #   POST /v1/audio/translations  （当前等同 transcriptions）
+    #   GET  /v1/models
+    addr = '0.0.0.0'
+    port = 6017
+
+    # 为空则不校验 Authorization；填写后客户端需传 Bearer <api_key>
+    api_key = ''
+
+    # 单个请求最大上传体积，单位 MB
+    max_upload_mb = 200
+
+    # 请求等待识别结果的超时时间，单位秒
+    request_timeout = 600
+
+    # 长音频送入现有识别队列时沿用客户端文件转录的切片策略
+    seg_duration = 60.0
+    seg_overlap = 4.0
+
+
 
 
 class ModelDownloadLinks:
@@ -167,4 +194,3 @@ class ForceAlignerGGUFArgs:
     # 对齐细节
     n_ctx = 3072                # 上下文窗口大小
     dml_pad_to = 30             # 开启 DirectML 加速时，短音频统一填充到指定长度，有加速效果
-

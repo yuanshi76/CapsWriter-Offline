@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from multiprocessing import Queue, Process
 from multiprocessing.managers import ListProxy
+from queue import Queue as ThreadQueue
 from typing import TYPE_CHECKING, Dict, Optional
 
 import websockets
@@ -47,6 +48,9 @@ class ServerState:
     queue_in: Queue = field(default_factory=Queue)
     queue_out: Queue = field(default_factory=Queue)
 
+    # OpenAI 兼容 HTTP 接口等待中的请求，key 为 task_id
+    openapi_waiters: Dict[str, ThreadQueue] = field(default_factory=dict)
+
     # 识别子进程
     recognize_process: Optional[Process] = None
 
@@ -82,4 +86,3 @@ class WorkerState:
             from . import logger
             logger.debug(f"清理了 {len(stale_ids)} 个已断开连接的 session")
         return len(stale_ids)
-

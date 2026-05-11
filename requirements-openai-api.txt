@@ -1,0 +1,3 @@
+# OpenAI 兼容接口当前只使用 Python 标准库，不需要额外 pip 包。
+# 如果后续把接口改为 FastAPI/aiohttp 等实现，可把依赖写在这里，
+# 再运行 package_openai_api_internal.py 安装到便携版 internal 目录。
