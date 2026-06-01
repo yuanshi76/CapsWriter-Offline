@@ -28,6 +28,12 @@ async def ws_send(app):
                 logger.info("收到退出通知，停止发送任务")
                 return
 
+            waiter = state.openapi_waiters.get(result.task_id)
+            if waiter:
+                waiter.put(result)
+                logger.debug(f"OpenAI 兼容接口取走识别结果，任务ID: {result.task_id}")
+                continue
+
             # 1. 将内部 Result 转换为标准的协议消息对象
             msg = RecognitionMessage(
                 task_id=result.task_id,
@@ -68,5 +74,4 @@ async def ws_send(app):
         except Exception as e:
             logger.error(f"发送结果时发生错误: {e}", exc_info=True)
             print(e)
-
 

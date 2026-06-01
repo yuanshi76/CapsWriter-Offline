@@ -15,6 +15,7 @@ from .state import ServerState, console
 from core.tools.signal_handler import register_signal
 from .worker.process_manager import ProcessManager
 from .connection.server_manager import SocketManager
+from .openai_api import OpenAIAPIServer
 from .ui.tray_manager import TrayManager
 from . import logger
 
@@ -39,6 +40,7 @@ class CapsWriterServer:
         # 基本配置与组件实例化
         self.process_manager = ProcessManager(self)
         self.socket_manager = SocketManager(self)
+        self.openai_api_server = OpenAIAPIServer(self)
         self.tray_manager = TrayManager(self)
 
         self.version = __version__
@@ -69,6 +71,9 @@ class CapsWriterServer:
 
         # 1. 关闭 WebSocket 服务（立即释放端口）
         self.socket_manager.stop()
+
+        # 1.5 关闭 OpenAI 兼容 HTTP 服务
+        self.openai_api_server.stop()
 
         # 2. 终止识别子进程
         self.process_manager.stop()
@@ -102,6 +107,9 @@ class CapsWriterServer:
 
         # 拉起识别子进程
         self.process_manager.start()
+
+        # 开启 OpenAI 兼容 HTTP 接口（独立线程，不阻塞原 WebSocket 服务）
+        self.openai_api_server.start()
         
         # 开启网络服务监听 (接管当前线程直至退出)
         try:
